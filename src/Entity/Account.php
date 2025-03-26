@@ -37,16 +37,10 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Assert\NotBlank(
-        message: "Le mot de passe ne doit pas être vide."
-    )]
-    #[Assert\Length(
-        min: 8, 
-        minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractères."
-    )]
     #[Assert\Regex(
-        pattern: "/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).+$/",
-        message: "Le mot de passe ne possède pas le bon format (1 majuscule, 1 minuscule, 1 caractère spécial, 1 chiffre)."
+        pattern: "/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}/",
+        match: true,
+        message: "Le mot de passe ne possède pas le bon format (1 majuscule, 1 minuscule, 1 caractère spécial, 1 chiffre, 8 caractères minimum)."
     )]
     #[Assert\NotCompromisedPassword(
         message: "Ce mot de passe a été compromis dans une fuite de données. Veuillez en choisir un autre."
@@ -72,6 +66,9 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
         minMessage: 'La longueur du nom doit être supérieure à {{ limit }}',
     )]
     private ?string $lastname = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $status = null;
 
     public function getId(): ?int
     {
@@ -128,7 +125,7 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
      * @see PasswordAuthenticatedUserInterface
      */
     public function getPassword(): ?string
-    {
+    { 
         return $this->password;
     }
 
@@ -168,6 +165,18 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastname(string $lastname): static
     {
         $this->lastname = $lastname;
+
+        return $this;
+    }
+
+    public function isStatus(): ?bool
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?bool $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }
